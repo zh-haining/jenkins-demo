@@ -1,0 +1,118 @@
+pipeline {
+    tools {
+     maven 'mvn3.6.3'
+     jdk 'jdk1.8'
+    }
+   agent any
+
+   options{
+       timestamps()
+   }
+
+   stages {
+      stage('拉取git代码并构建') {
+         steps {
+            echo 'branch_name ${branch_name}'
+            checkout([$class: 'GitSCM', branches: [[name: '${branch_name}']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CleanBeforeCheckout']], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'github-user-info', url: 'https://github.com/zh-haining/jenkins-demo.git']]])
+            echo 'Checkout over'
+            sh 'mvn clean package -Dmaven.test.skip=true'
+            echo 'package over'
+         }
+      }
+
+      stage('部署host9090'){
+        steps{
+             //备份
+             sh 'cp /Users/zh_haining/idea-workspace/workspace-2020/docker-volumes/demo/demo9090/ROOT.war /Users/zh_haining/idea-workspace/workspace-2020/docker-volumes/demo/bakup/demo9090/ROOT.war.bak'
+             //nginx 切流
+             sleep 2
+             //部署代码
+             sh '/Users/zh_haining/idea-workspace/workspace-2020/docker-volumes/demo/docker_startup_9090.sh'
+             sh 'cp /Users/zh_haining/.jenkins/workspace/demo/target/jenkins-demo-1.0.war /Users/zh_haining/idea-workspace/workspace-2020/docker-volumes/demo/demo9090/ROOT.war'
+             //nginx 回切
+             sleep 5
+        }
+      }
+
+      stage('部署host9091'){
+              steps{
+                   //备份
+                   sh 'cp /Users/zh_haining/idea-workspace/workspace-2020/docker-volumes/demo/demo9091/ROOT.war /Users/zh_haining/idea-workspace/workspace-2020/docker-volumes/demo/bakup/demo9091/ROOT.war.bak'
+                   //nginx 切流
+                   sleep 2
+                   //部署代码
+                   sh '/Users/zh_haining/idea-workspace/workspace-2020/docker-volumes/demo/docker_startup_9091.sh'
+                   sh 'cp /Users/zh_haining/.jenkins/workspace/demo/target/jenkins-demo-1.0.war /Users/zh_haining/idea-workspace/workspace-2020/docker-volumes/demo/demo9091/ROOT.war'
+                   //nginx 回切
+                   sleep 8
+              }
+            }
+
+            stage('部署host9092'){
+                    steps{
+                         //备份
+                         sh 'cp /Users/zh_haining/idea-workspace/workspace-2020/docker-volumes/demo/demo9092/ROOT.war /Users/zh_haining/idea-workspace/workspace-2020/docker-volumes/demo/bakup/demo9092/ROOT.war.bak'
+                         //nginx 切流
+                         sleep 2
+                         //部署代码
+                         sh '/Users/zh_haining/idea-workspace/workspace-2020/docker-volumes/demo/docker_startup_9092.sh'
+                         sh 'cp /Users/zh_haining/.jenkins/workspace/demo/target/jenkins-demo-1.0.war /Users/zh_haining/idea-workspace/workspace-2020/docker-volumes/demo/demo9092/ROOT.war'
+                         //nginx 回切
+                         sleep 12
+                    }
+                  }
+
+             stage('部署host9093'){
+                     steps{
+                          //备份
+                          sh 'cp /Users/zh_haining/idea-workspace/workspace-2020/docker-volumes/demo/demo9093/ROOT.war /Users/zh_haining/idea-workspace/workspace-2020/docker-volumes/demo/bakup/demo9093/ROOT.war.bak'
+                          //nginx 切流
+                          sleep 2
+                          //部署代码
+                          sh '/Users/zh_haining/idea-workspace/workspace-2020/docker-volumes/demo/docker_startup_9093.sh'
+                          sh 'cp /Users/zh_haining/.jenkins/workspace/demo/target/jenkins-demo-1.0.war /Users/zh_haining/idea-workspace/workspace-2020/docker-volumes/demo/demo9093/ROOT.war'
+                          //nginx 回切
+                          sleep 15
+                     }
+                   }
+
+              stage('部署host9094'){
+                      steps{
+                           //备份
+                           sh 'cp /Users/zh_haining/idea-workspace/workspace-2020/docker-volumes/demo/demo9094/ROOT.war /Users/zh_haining/idea-workspace/workspace-2020/docker-volumes/demo/bakup/demo9094/ROOT.war.bak'
+                           //nginx 切流
+                           sleep 2
+                           //部署代码
+                           sh '/Users/zh_haining/idea-workspace/workspace-2020/docker-volumes/demo/docker_startup_9094.sh'
+                           sh 'cp /Users/zh_haining/.jenkins/workspace/demo/target/jenkins-demo-1.0.war /Users/zh_haining/idea-workspace/workspace-2020/docker-volumes/demo/demo9094/ROOT.war'
+                           //nginx 回切
+                           sleep 9
+                      }
+                    }
+
+               stage('部署host9095'){
+                       steps{
+                            //备份
+                            sh 'cp /Users/zh_haining/idea-workspace/workspace-2020/docker-volumes/demo/demo9095/ROOT.war /Users/zh_haining/idea-workspace/workspace-2020/docker-volumes/demo/bakup/demo9095/ROOT.war.bak'
+                            //nginx 切流
+                            sleep 2
+                            //部署代码
+                            sh '/Users/zh_haining/idea-workspace/workspace-2020/docker-volumes/demo/docker_startup_9095.sh'
+                            sh 'cp /Users/zh_haining/.jenkins/workspace/demo/target/jenkins-demo-1.0.war /Users/zh_haining/idea-workspace/workspace-2020/docker-volumes/demo/demo9095/ROOT.war'
+                            //nginx 回切
+                            sleep 15
+                       }
+                     }
+   }
+   post {
+    always {
+        echo ''
+    }
+    success {
+        echo ''
+    }
+    failure{
+        echo 'deploy faile ,send email or msg ......'
+    }
+  }
+}
