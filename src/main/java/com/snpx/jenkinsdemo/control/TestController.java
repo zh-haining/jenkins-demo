@@ -11,7 +11,7 @@ public class TestController {
     @GetMapping(value = "/hello")
     public String sayHello(String name){
         String uuid = UUID.randomUUID().toString().toLowerCase();
-        String msg = String.format("Hi %s, nice | %s",name,uuid);
+        String msg = String.format("Hi %s, nice to meet you | %s",name,uuid);
         System.out.println(msg);
         return msg;
     }
