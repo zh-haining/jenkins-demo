@@ -10,8 +10,8 @@ public class TestController {
 
     @GetMapping(value = "/hello")
     public String sayHello(String name){
-        String uuid = UUID.randomUUID().toString().toUpperCase();
-        String msg = String.format("Hi %s, hello world | %s",name,uuid);
+        String uuid = UUID.randomUUID().toString().toLowerCase();
+        String msg = String.format("Hi %s, nice | %s",name,uuid);
         System.out.println(msg);
         return msg;
     }
